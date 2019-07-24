@@ -9,13 +9,12 @@
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "outDir": "lib"
+    "esModuleInterop": true
   },
   "include": [
     "index.ts",
-    "src/transformer.ts",
-    "src/compile.ts"
+    "transformer.ts",
+    "compile.ts"
   ],
   "exclude": [
     "node_modules"

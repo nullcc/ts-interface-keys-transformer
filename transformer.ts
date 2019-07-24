@@ -110,7 +110,7 @@ const _getPropertiesOfSymbol = (symbol: ts.Symbol, propertyPathElements: Interfa
   return properties;
 };
 
-const indexTs = path.join(__dirname, '../index.ts');
+const indexTs = path.join(__dirname, './index.ts');
 const isKeysCallExpression = (node: ts.Node, typeChecker: ts.TypeChecker): node is ts.CallExpression => {
   if (!ts.isCallExpression(node)) {
     return false;
