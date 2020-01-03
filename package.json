@@ -1,6 +1,6 @@
 {
   "name": "ts-interface-keys-transformer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "repository": "https://github.com/nullcc/ts-interface-keys-transformer",
