@@ -7,8 +7,6 @@
     "test": "tsc && node test/index.js && jest --coverage",
     "build": "tsc",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run tslint",
-    "preversion": "npm run tslint",
     "postversion": "git push && git push --tags"
   },
   "author": "Ethan Zhang",
