@@ -6,6 +6,19 @@ which support nested keys and optionality.
 
 ## Usage
 
+```bash
+$ npm i ttypescript
+$ npm i ts-interface-keys-transformer
+```
+
+then add following to "compilerOptions" field in tsconfig.json:
+
+```json
+"plugins": [
+      { "transform": "ts-transformer-keys/transformer" }
+    ]
+```
+
 ### Nested interface
 ```typescript
 import { keys } from 'ts-interface-keys-transformer';

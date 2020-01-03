@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "repository": "https://github.com/nullcc/ts-interface-keys-transformer",
+  "bugs": "https://github.com/nullcc/ts-interface-keys-transformer/issues",
   "scripts": {
     "test": "tsc && node test/index.js && jest --coverage",
     "build": "tsc",

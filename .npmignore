@@ -10,3 +10,4 @@ package-lock.json
 .travis.yml
 .npmrc
 .npmrc.template
+*.ts
