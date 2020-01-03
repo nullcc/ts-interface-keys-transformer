@@ -4,17 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tsc && node test/index.js && jest",
+    "test": "tsc && node test/index.js && jest --coverage",
     "build": "tsc",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
-    "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags",
-    "install": "npm run build"
+    "prepublishOnly": "npm run tslint",
+    "preversion": "npm run tslint",
+    "postversion": "git push && git push --tags"
   },
   "author": "Ethan Zhang",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^24.0.13",
     "@types/node": "^12.0.7",

@@ -1,0 +1,12 @@
+src
+test
+tsconfig.json
+tslint.json
+jest.config.js
+coverage
+.idea
+.DS_Store
+package-lock.json
+.travis.yml
+.npmrc
+.npmrc.template

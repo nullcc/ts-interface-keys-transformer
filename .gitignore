@@ -1,5 +1,6 @@
-.idea
 node_modules
-**/*.js
-!test/index.js
-!jest.config.js
+/lib
+.idea
+.DS_Store
+coverage
+package-lock.json
