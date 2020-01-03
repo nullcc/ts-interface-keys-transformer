@@ -7,11 +7,10 @@ which support nested keys and optionality.
 ## Usage
 
 ```bash
-$ npm i ttypescript
-$ npm i ts-interface-keys-transformer
+$ npm i -D typescript ttypescript ts-interface-keys-transformer
 ```
 
-then add following to "compilerOptions" field in tsconfig.json:
+and then add following to "compilerOptions" field in tsconfig.json:
 
 ```json
 "plugins": [
@@ -19,9 +18,15 @@ then add following to "compilerOptions" field in tsconfig.json:
     ]
 ```
 
+Use following command to run (assume index.js is the compiled file of index.ts):
+
+```bash
+$ ttsc -p tsconfig.json && node index.js
+```
+
 ### Nested interface
 ```typescript
-import { keys } from 'ts-interface-keys-transformer';
+import { keys } from 'ts-interface-keys-transformer/index';
 
 interface Foo {
   a: string;
@@ -46,7 +51,7 @@ console.log(keys<Foo>());
 
 ### Nested type
 ```typescript
-import { keys } from 'ts-interface-keys-transformer';
+import { keys } from 'ts-interface-keys-transformer/index';
 
 type Foo = {
   a: string;
@@ -73,7 +78,7 @@ console.log(keys<Foo>());
 
 ### Mix interface and type
 ```typescript
-import { keys } from 'ts-interface-keys-transformer';
+import { keys } from 'ts-interface-keys-transformer/index';
 
 interface Foo {
   a: string;
@@ -100,7 +105,7 @@ console.log(keys<Foo>());
 
 ### Interface properties has question mark
 ```typescript
-import { keys } from 'ts-interface-keys-transformer';
+import { keys } from 'ts-interface-keys-transformer/index';
 
 type Foo = {
   a?: string;
