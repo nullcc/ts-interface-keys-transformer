@@ -1,4 +1,4 @@
-import { keys } from '../index';
+import { keys } from '../src/index';
 import { X } from './interface';
 
 describe('Test transformer.', () => {
