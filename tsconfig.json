@@ -10,13 +10,13 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": ".",
-    "declarationDir": "."
+    "outDir": "lib",
+    "declarationDir": "lib/types"
   },
   "include": [
-    "index.ts",
-    "transformer.ts",
-    "compile.ts"
+    "src/index.ts",
+    "src/transformer.ts",
+    "src/compile.ts"
   ],
   "exclude": [
     "node_modules",

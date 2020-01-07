@@ -122,7 +122,7 @@ const isKeysCallExpression = (node: ts.Node, typeChecker: ts.TypeChecker): node 
   const { declaration } = signature;
   return !!declaration
     && !ts.isJSDocSignature(declaration)
-    && (path.join(declaration.getSourceFile().fileName) === indexTs)
+    && (path.join(declaration.getSourceFile().fileName.replace('src', 'lib')) === indexTs)
     && !!declaration.name
     && declaration.name.getText() === 'keys';
 };
