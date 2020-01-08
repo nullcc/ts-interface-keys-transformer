@@ -8,15 +8,12 @@
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "declaration": true,
-    "outDir": "lib",
-    "declarationDir": "lib/types"
+    "esModuleInterop": true
   },
   "include": [
-    "src/index.ts",
-    "src/transformer.ts",
-    "src/compile.ts"
+    "index.ts",
+    "transformer.ts",
+    "compile.ts"
   ],
   "exclude": [
     "node_modules",
