@@ -26,7 +26,7 @@ $ ttsc -p tsconfig.json && node index.js
 
 ### Nested interface
 ```typescript
-import { keys } from 'ts-interface-keys-transformer/index';
+import { keys } from 'ts-interface-keys-transformer';
 
 interface Foo {
   a: string;
@@ -51,7 +51,7 @@ console.log(keys<Foo>());
 
 ### Nested type
 ```typescript
-import { keys } from 'ts-interface-keys-transformer/index';
+import { keys } from 'ts-interface-keys-transformer';
 
 type Foo = {
   a: string;
@@ -78,7 +78,7 @@ console.log(keys<Foo>());
 
 ### Mix interface and type
 ```typescript
-import { keys } from 'ts-interface-keys-transformer/index';
+import { keys } from 'ts-interface-keys-transformer';
 
 interface Foo {
   a: string;
@@ -105,7 +105,7 @@ console.log(keys<Foo>());
 
 ### Interface properties has question mark
 ```typescript
-import { keys } from 'ts-interface-keys-transformer/index';
+import { keys } from 'ts-interface-keys-transformer';
 
 type Foo = {
   a?: string;
