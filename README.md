@@ -14,7 +14,7 @@ and then add following to "compilerOptions" field in tsconfig.json:
 
 ```json
 "plugins": [
-      { "transform": "ts-transformer-keys/transformer" }
+      { "transform": "ts-interface-keys-transformer/transformer" }
     ]
 ```
 
