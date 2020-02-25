@@ -1,1 +1,1 @@
-export declare function keys<T extends object>(): Array<keyof T>;
+export declare function keys<T extends object>(): {name: string, optional: boolean}[];
