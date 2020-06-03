@@ -1,5 +1,6 @@
-import * as ts from 'typescript';
 import * as path from 'path';
+import * as _ from 'lodash';
+import * as ts from 'typescript';
 
 export default (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   return (ctx: ts.TransformationContext) => {
@@ -12,18 +13,23 @@ export default (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   };
 }
 
-interface InterfaceProperty {
+interface Property {
   name: string;
+  modifiers: string[];
   optional: boolean;
+  type: string;
+  elementKeys?: string[];
+  elementType?: any;
 }
 
 const symbolMap = new Map<string, ts.Symbol>();
 
 const visitNode = (node: ts.Node, program: ts.Program): ts.Node => {
+  // collect all top level symbols in the source file
   if (node.kind === ts.SyntaxKind.SourceFile) {
-    (<any>node).locals.forEach((value: any, key: string) => {
-      if (!symbolMap.get(key)) {
-        symbolMap.set(key, value);
+    node['locals'].forEach((symbol: ts.Symbol, key: string) => {
+      if (!symbolMap.has(key)) {
+        symbolMap.set(key, symbol);
       }
     });
   }
@@ -35,32 +41,52 @@ const visitNode = (node: ts.Node, program: ts.Program): ts.Node => {
     return ts.createArrayLiteral([]);
   }
   const type = typeChecker.getTypeFromTypeNode(node.typeArguments[0]);
-  let properties: InterfaceProperty[] = [];
+  let properties: Property[] = [];
   const symbols = typeChecker.getPropertiesOfType(type);
   symbols.forEach(symbol => {
-    properties = [ ...properties, ...getPropertiesOfSymbol(symbol, [], symbolMap) ];
+    properties = [ ...properties, ...getSymbolProperties(symbol, [], symbolMap) ];
   });
 
   return ts.createArrayLiteral(properties.map(property => ts.createRegularExpressionLiteral(JSON.stringify(property))));
 };
 
-const getPropertiesOfSymbol = (symbol: ts.Symbol, outerLayerProperties: InterfaceProperty[], symbolMap: Map<string, ts.Symbol>): InterfaceProperty[] => {
-  let properties: InterfaceProperty[] = [];
-  let propertyPathElements = JSON.parse(JSON.stringify(outerLayerProperties.map(property => property)));
-  const property = symbol.escapedName;
-  propertyPathElements.push(property);
-  let optional = true;
-  for (let declaration of symbol.declarations) {
-    if (undefined === (<any>declaration).questionToken) {
-      optional = false;
-      break;
+const getSymbolProperties = (symbol: ts.Symbol, outerLayerProperties: Property[], symbolMap: Map<string, ts.Symbol>): Property[] => {
+  let properties: Property[] = [];
+  const propertyPathElements = JSON.parse(JSON.stringify(outerLayerProperties.map(property => property)));
+  const propertyName = symbol.escapedName;
+  propertyPathElements.push(propertyName);
+  /* please note: due to interface or type can be a intersection types (e.g. A & B)
+   * or a union types (e.g. A | B), these types have no "valueDeclaration" property.
+   * We must traverse the "symbol.declarations" to collect "questionToken" of all sub types
+   */
+  const optional = _.some(symbol.declarations, (declaration: ts.PropertyDeclaration) => {
+    return !!declaration.questionToken;
+  });
+  const modifiers: string[] = [];
+  symbol.declarations.forEach((declaration: any) => {
+    if (declaration.modifiers) {
+      declaration.modifiers.forEach((modifier: ts.Token<ts.SyntaxKind.ReadonlyKeyword>) => {
+        modifiers.push(getModifierType(modifier));
+      });
+    }
+  });
+  const property: Property = {
+    name: propertyPathElements.join('.'),
+    modifiers,
+    optional,
+    type: getPropertyType(symbol.valueDeclaration ? symbol.valueDeclaration['type'] : symbol['type']),
+  };
+  if (symbol.valueDeclaration && symbol.valueDeclaration['type'].kind === ts.SyntaxKind.ArrayType) { // array
+    const elementType = getPropertyType(symbol.valueDeclaration['type'].elementType);
+    if (elementType === 'object') {
+      property.elementKeys = _.flattenDeep(symbol.valueDeclaration['type'].elementType.members.map((member: any) => {
+        return getSymbolProperties(member.symbol, [], symbolMap);
+      }));
+    } else {
+      property.elementType = elementType;
     }
   }
-  const key = <InterfaceProperty> {
-    name: propertyPathElements.join('.'),
-    optional,
-  };
-  properties.push(key);
+  properties.push(property);
 
   const propertiesOfSymbol = _getPropertiesOfSymbol(symbol, propertyPathElements, symbolMap);
   properties = [
@@ -79,11 +105,11 @@ const isInnerLayerSymbol = (symbol: any): boolean => {
   return symbol.valueDeclaration && symbol.valueDeclaration.symbol.valueDeclaration.type.typeName;
 };
 
-const _getPropertiesOfSymbol = (symbol: ts.Symbol, propertyPathElements: InterfaceProperty[], symbolMap: Map<string, ts.Symbol>): InterfaceProperty[] => {
+const _getPropertiesOfSymbol = (symbol: ts.Symbol, propertyPathElements: Property[], symbolMap: Map<string, ts.Symbol>): Property[] => {
   if (!isOutermostLayerSymbol(symbol) && !isInnerLayerSymbol(symbol)) {
     return [];
   }
-  let properties: InterfaceProperty[] = [];
+  let properties: Property[] = [];
   let members: any;
   if ((<any>symbol.valueDeclaration).type.symbol) {
     members = (<any>symbol.valueDeclaration).type.members.map((member: any) => member.symbol);
@@ -102,13 +128,49 @@ const _getPropertiesOfSymbol = (symbol: ts.Symbol, propertyPathElements: Interfa
     members.forEach((member: any) => {
       properties = [
         ...properties,
-        ...getPropertiesOfSymbol(member, propertyPathElements, symbolMap),
+        ...getSymbolProperties(member, propertyPathElements, symbolMap),
       ];
     });
   }
 
   return properties;
 };
+
+const getPropertyType = (symbol: any): string => {
+  switch (symbol.kind) {
+    case ts.SyntaxKind.ArrayType:
+      return 'array';
+    case ts.SyntaxKind.StringKeyword:
+      return 'string';
+    case ts.SyntaxKind.NumberKeyword:
+      return 'number';
+    case ts.SyntaxKind.BooleanKeyword:
+      return 'boolean';
+    case ts.SyntaxKind.FunctionType:
+      return 'Function';
+    case ts.SyntaxKind.TypeReference:
+      return symbol.typeName.escapedText;
+    case ts.SyntaxKind.AnyKeyword:
+      return 'any';
+    case ts.SyntaxKind.TypeLiteral:
+      return 'object';
+    case ts.SyntaxKind.UnionType:
+      return symbol.types.map((token: any) => getPropertyType(token));
+    case ts.SyntaxKind.IntersectionType:
+      return symbol.types.map((token: any) => getPropertyType(token))
+    default:
+      return 'unknown';
+  }
+};
+
+const getModifierType = (modifier: ts.Token<ts.SyntaxKind>): string => {
+  switch (modifier.kind) {
+    case ts.SyntaxKind.ReadonlyKeyword:
+      return 'readonly';
+    default:
+      return 'unknown';
+  }
+}
 
 const indexTs = path.join(__dirname, './index.ts');
 const isKeysCallExpression = (node: ts.Node, typeChecker: ts.TypeChecker): node is ts.CallExpression => {
