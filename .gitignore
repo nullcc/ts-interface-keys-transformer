@@ -5,3 +5,5 @@ node_modules
 coverage
 package-lock.json
 .npmrc
+*.js
+!jest.config.js
