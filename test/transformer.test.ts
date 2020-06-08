@@ -1,5 +1,5 @@
 import { keys } from '../index';
-import { X } from './interface';
+import { X  } from './interface';
 
 describe('Test transformer.', () => {
   test('Should get keys of interface 1.', () => {
@@ -122,5 +122,29 @@ describe('Test transformer.', () => {
       { name: 'c.c.b', optional: false },
       { name: 'c.c.c', optional: false }
     ]);
+  });
+
+  test('Should get keys of interface 5.', () => {
+    class Bar {}
+    interface Foo {
+      a: string[];
+      readonly b: {
+        readonly b1: string;
+        b2: number;
+        b3: {
+          b31: string;
+          b32: string;
+        }
+      }[];
+      c: number;
+      d: boolean;
+      e: Set<string>;
+      f: Symbol;
+      g: Map<string, string>;
+      h: Bar;
+      i?: Function;
+      j: () => {};
+    }
+    console.log(JSON.stringify(keys<Foo>(), null, 4));
   });
 });

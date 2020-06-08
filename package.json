@@ -1,6 +1,6 @@
 {
   "name": "ts-interface-keys-transformer",
-  "version": "1.0.10",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "types": "index.d.ts",
@@ -16,9 +16,13 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^24.0.13",
+    "@types/lodash": "^4.14.154",
     "@types/node": "^12.0.7",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.5.1"
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
   }
 }
