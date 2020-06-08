@@ -152,6 +152,8 @@ const getPropertyType = (symbol: any): string => {
       return symbol.typeName.escapedText;
     case ts.SyntaxKind.AnyKeyword:
       return 'any';
+    case ts.SyntaxKind.NullKeyword:
+      return 'null';
     case ts.SyntaxKind.TypeLiteral:
       return 'object';
     case ts.SyntaxKind.UnionType:
