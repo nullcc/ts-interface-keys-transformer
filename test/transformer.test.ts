@@ -123,7 +123,7 @@ describe('Test transformer.', () => {
     ]);
   });
 
-  test('Should get keys of interface which contains keys with array type (element is primitive type).', () => {
+  test('Should get keys of interface which contains keys with array type (element has primitive type).', () => {
     interface Foo {
       a: string[];
       b: number[];
@@ -176,6 +176,113 @@ describe('Test transformer.', () => {
         "elementType": "object"
       }
     ]);
+  });
+
+  test('Should get keys of interface which contains keys with array type (element has complex type).', () => {
+    interface Foo {
+      a: {
+        a1: string;
+        a2: number;
+      }[];
+      b: Array<{
+        b1: number;
+        b2: boolean;
+        b3: string[];
+        b4: Array<{
+          b41: number;
+          b42: string;
+          b43: Array<{
+            readonly b431: string;
+          }>;
+        }>;
+      }>;
+    }
+    expect(keys<Foo>()).toMatchObject([
+        {
+          "name": "a",
+          "modifiers": [],
+          "optional": false,
+          "type": "array",
+          "elementKeys": [
+            {
+              "name": "a1",
+              "modifiers": [],
+              "optional": false,
+              "type": "string"
+            },
+            {
+              "name": "a2",
+              "modifiers": [],
+              "optional": false,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "name": "b",
+          "modifiers": [],
+          "optional": false,
+          "type": "Array",
+          "elementKeys": [
+            {
+              "name": "b1",
+              "modifiers": [],
+              "optional": false,
+              "type": "number"
+            },
+            {
+              "name": "b2",
+              "modifiers": [],
+              "optional": false,
+              "type": "boolean"
+            },
+            {
+              "name": "b3",
+              "modifiers": [],
+              "optional": false,
+              "type": "array",
+              "elementType": "string"
+            },
+            {
+              "name": "b4",
+              "modifiers": [],
+              "optional": false,
+              "type": "Array",
+              "elementKeys": [
+                {
+                  "name": "b41",
+                  "modifiers": [],
+                  "optional": false,
+                  "type": "number"
+                },
+                {
+                  "name": "b42",
+                  "modifiers": [],
+                  "optional": false,
+                  "type": "string"
+                },
+                {
+                  "name": "b43",
+                  "modifiers": [],
+                  "optional": false,
+                  "type": "Array",
+                  "elementKeys": [
+                    {
+                      "name": "b431",
+                      "modifiers": [
+                        "readonly"
+                      ],
+                      "optional": false,
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    );
   });
 
   test('Should get keys of interface which contains keys modified by modifiers.', () => {

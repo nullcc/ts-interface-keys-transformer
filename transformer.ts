@@ -76,15 +76,23 @@ const getSymbolProperties = (symbol: ts.Symbol, outerLayerProperties: Property[]
     optional,
     type: getPropertyType(symbol.valueDeclaration ? symbol.valueDeclaration['type'] : symbol['type']),
   };
-  if (symbol.valueDeclaration && symbol.valueDeclaration['type'].kind === ts.SyntaxKind.ArrayType) { // array
+  if (symbol.valueDeclaration && symbol.valueDeclaration['type'].kind === ts.SyntaxKind.ArrayType) { // array: []
     const elementType = getPropertyType(symbol.valueDeclaration['type'].elementType);
     if (symbol.valueDeclaration['type'].elementType.members) {
       property.elementKeys = _.flattenDeep(symbol.valueDeclaration['type'].elementType.members.map((member: any) => {
         return getSymbolProperties(member.symbol, [], symbolMap);
       }));
+    } else if (symbol['typeArguments']) {
+      property.elementKeys = _.flattenDeep(symbol['typeArguments'][0].members.map((member: any) => {
+        return getSymbolProperties(member.symbol, [], symbolMap);
+      }));
     } else {
       property.elementType = elementType;
     }
+  } else if (symbol.valueDeclaration && symbol.valueDeclaration['type']['typeArguments']) { // for Array<xxx>
+    property.elementKeys = _.flattenDeep(symbol.valueDeclaration['type']['typeArguments'][0].members.map((member: any) => {
+      return getSymbolProperties(member.symbol, [], symbolMap);
+    }));
   }
   properties.push(property);
 
