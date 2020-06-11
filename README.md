@@ -1,7 +1,7 @@
 # ts-interface-keys-transformer
 
 `ts-interface-keys-transformer` is inspired by [ts-transformer-keys](https://github.com/kimamula/ts-transformer-keys).
-It uses custom transformer to parse the keys in 'interface' and 'type' in compile stage in TypeScript 
+It uses a custom transformer to parse the keys in 'interface' and 'type' in compile stage in TypeScript 
 which support nested keys and optionality.
 
 ## Usage
@@ -24,113 +24,104 @@ Use following command to run (assume index.js is the compiled file of index.ts):
 $ ttsc -p tsconfig.json && node index.js
 ```
 
-### Nested interface
+### Works With Simple Interface
 ```typescript
 import { keys } from 'ts-interface-keys-transformer';
 
 interface Foo {
   a: string;
-  b: number;
-  c: Bar;
+  readonly b: number;
+  c?: boolean;
 }
-
-interface Bar {
-  a: string;
-  b: number;
-}
-
-// [
-//   { name: 'a', optional: false },
-//   { name: 'b', optional: false },
-//   { name: 'c', optional: false },
-//   { name: 'c.a', optional: false },
-//   { name: 'c.b', optional: false },
-//]
+// [ { name: 'a', modifiers: [], optional: false, type: 'string' },
+//   { name: 'b', modifiers: [ 'readonly' ], optional: false, type: 'number' },
+//   { name: 'c', modifiers: [], optional: true, type: 'boolean' } ]
 console.log(keys<Foo>());
 ```
 
-### Nested type
-```typescript
-import { keys } from 'ts-interface-keys-transformer';
-
-type Foo = {
-  a: string;
-  b: number;
-  c: Bar;
-}
-
-type Bar = {
-  d: string;
-  e: number;
-  f: boolean;
-}
-
-// [
-//   { name: 'a', optional: false },
-//   { name: 'b', optional: false },
-//   { name: 'c', optional: false },
-//   { name: 'c.d', optional: false },
-//   { name: 'c.e', optional: false },
-//   { name: 'c.f', optional: false },
-//]
-console.log(keys<Foo>());
-```
-
-### Mix interface and type
+### Works With Complex Interface
 ```typescript
 import { keys } from 'ts-interface-keys-transformer';
 
 interface Foo {
   a: string;
-  b: number;
-  c: Bar;
+  b: {
+    b1: string;
+    b2: number;
+  },
+  c: string[];
+  d: Array<{
+    d1: string;
+    d2: number;
+  }>;
 }
-
-type Bar = {
-  d: string;
-  e: number;
-  f: boolean;
-}
-
-// [
-//   { name: 'a', optional: false },
-//   { name: 'b', optional: false },
-//   { name: 'c', optional: false },
-//   { name: 'c.d', optional: false },
-//   { name: 'c.e', optional: false },
-//   { name: 'c.f', optional: false },
-//]
+// [ { "name": "a", "modifiers": [], "optional": false, "type": "string" },
+//   { "name": "b", "modifiers": [], "optional": false, "type": "object" },
+//   { "name": "b.b1", "modifiers": [], "optional": false, "type": "string" },
+//   { "name": "b.b2", "modifiers": [], "optional": false, "type": "number" },
+//   { "name": "c", "modifiers": [], "optional": false, "type": "array", "elementType": "string" },
+//   { 
+//     "name": "d",
+//     "modifiers": [],
+//     "optional": false,
+//     "type": "Array",
+//     "elementKeys": [
+//       {
+//         "name": "d1",
+//         "modifiers": [],
+//         "optional": false,
+//         "type": "string"
+//       },
+//       {
+//         "name": "d2",
+//         "modifiers": [],
+//         "optional": false,
+//         "type": "number"
+//       }
+//     ]
+//   } ]
 console.log(keys<Foo>());
 ```
 
-### Interface properties has question mark
+### Works With Intersection Type
 ```typescript
 import { keys } from 'ts-interface-keys-transformer';
 
-type Foo = {
-  a?: string;
-  b: number;
-  c: Bar; 
+interface Foo {
+  a: string;
 }
-
 interface Bar {
-  d?: string;
-  e?: number;
-  f: boolean;
+  b: string;
 }
-
-// [
-//   { name: 'a', optional: true },
-//   { name: 'b', optional: false },
-//   { name: 'c', optional: false },
-//   { name: 'c.d', optional: true },
-//   { name: 'c.e', optional: true },
-//   { name: 'c.f', optional: false },
-//]
-console.log(keys<Foo>());
+// [ { "name": "a", "modifiers": [], "optional": false, "type": "string" },
+//   { "name": "b", "modifiers": [], "optional": false, "type": "string" } ]
+console.log(keys<Foo & Bar>());
 ```
 
-## Run tests
+### Works With Union Type
+```typescript
+import { keys } from 'ts-interface-keys-transformer';
+
+interface Foo {
+  a: string;
+}
+interface Bar {
+  a: string;
+  b: string;
+}
+// [ { "name": "a", "modifiers": [], "optional": false, "type": "string"} ]
+console.log(keys<Foo | Bar>());
+```
+
+See more test cases in [Tests](./test/transformer.test.ts)
+
+## Build
+
+```bash
+npm run build
+```
+
+## Run Tests
 
 ```bash
 npm test

@@ -1,150 +1,405 @@
 import { keys } from '../index';
-import { X  } from './interface';
 
 describe('Test transformer.', () => {
-  test('Should get keys of interface 1.', () => {
+  test('Should get keys of interface which contains simple key types.', () => {
     interface Foo {
       a: string;
-      b?: number;
+      b: number;
       c: boolean;
       d: Function;
-      e: object;
-      f: any;
+      e: any;
+      f: object;
       g: null;
-      h: keyof {};
-      i?: number | null;
-      j: number[];
-      k: string[] | null;
-      l: {
-        a: string;
-        b: number;
+    }
+    expect(keys<Foo>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "b",
+        "modifiers": [],
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "c",
+        "modifiers": [],
+        "optional": false,
+        "type": "boolean"
+      },
+      {
+        "name": "d",
+        "modifiers": [],
+        "optional": false,
+        "type": "Function"
+      },
+      {
+        "name": "e",
+        "modifiers": [],
+        "optional": false,
+        "type": "any"
+      },
+      {
+        "name": "f",
+        "modifiers": [],
+        "optional": false,
+        "type": "object"
+      },
+      {
+        "name": "g",
+        "modifiers": [],
+        "optional": false,
+        "type": "null"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains nest key types.', () => {
+    interface Foo {
+      a: {
+        a1: number;
+        a2: string;
       };
-      m: Bar;
-      n: X;
-      o: T;
-      p: Bar | Baz;
-      q: Bar & Baz;
+      b: {
+        b1: boolean;
+        b2: {
+          b21: string;
+          b22: number;
+        };
+      };
+    }
+    expect(keys<Foo>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": "object"
+      },
+      {
+        "name": "a.a1",
+        "modifiers": [],
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "a.a2",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "b",
+        "modifiers": [],
+        "optional": false,
+        "type": "object"
+      },
+      {
+        "name": "b.b1",
+        "modifiers": [],
+        "optional": false,
+        "type": "boolean"
+      },
+      {
+        "name": "b.b2",
+        "modifiers": [],
+        "optional": false,
+        "type": "object"
+      },
+      {
+        "name": "b.b2.b21",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "b.b2.b22",
+        "modifiers": [],
+        "optional": false,
+        "type": "number"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains keys with array type (element has primitive type).', () => {
+    interface Foo {
+      a: string[];
+      b: number[];
+      c: boolean[];
+      d: Function[];
+      e: any[];
+      f: object[];
+    }
+    expect(keys<Foo>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementType": "string"
+      },
+      {
+        "name": "b",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementType": "number"
+      },
+      {
+        "name": "c",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementType": "boolean"
+      },
+      {
+        "name": "d",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementType": "Function"
+      },
+      {
+        "name": "e",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementType": "any"
+      },
+      {
+        "name": "f",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementType": "object"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains keys with array type (element has complex type).', () => {
+    interface Foo {
+      a: {
+        a1: string;
+        a2: number;
+      }[];
+      b: Array<{
+        b1: number;
+        b2: boolean;
+        b3: string[];
+        b4: Array<{
+          b41: number;
+          b42: string;
+          b43: Array<{
+            readonly b431: string;
+          }>;
+        }>;
+      }>;
+    }
+    expect(keys<Foo>()).toMatchObject([
+        {
+          "name": "a",
+          "modifiers": [],
+          "optional": false,
+          "type": "array",
+          "elementKeys": [
+            {
+              "name": "a1",
+              "modifiers": [],
+              "optional": false,
+              "type": "string"
+            },
+            {
+              "name": "a2",
+              "modifiers": [],
+              "optional": false,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "name": "b",
+          "modifiers": [],
+          "optional": false,
+          "type": "Array",
+          "elementKeys": [
+            {
+              "name": "b1",
+              "modifiers": [],
+              "optional": false,
+              "type": "number"
+            },
+            {
+              "name": "b2",
+              "modifiers": [],
+              "optional": false,
+              "type": "boolean"
+            },
+            {
+              "name": "b3",
+              "modifiers": [],
+              "optional": false,
+              "type": "array",
+              "elementType": "string"
+            },
+            {
+              "name": "b4",
+              "modifiers": [],
+              "optional": false,
+              "type": "Array",
+              "elementKeys": [
+                {
+                  "name": "b41",
+                  "modifiers": [],
+                  "optional": false,
+                  "type": "number"
+                },
+                {
+                  "name": "b42",
+                  "modifiers": [],
+                  "optional": false,
+                  "type": "string"
+                },
+                {
+                  "name": "b43",
+                  "modifiers": [],
+                  "optional": false,
+                  "type": "Array",
+                  "elementKeys": [
+                    {
+                      "name": "b431",
+                      "modifiers": [
+                        "readonly"
+                      ],
+                      "optional": false,
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    );
+  });
+
+  test('Should get keys of interface which contains keys modified by modifiers.', () => {
+    interface Foo {
+      readonly a: string;
+    }
+    expect(keys<Foo>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [
+          "readonly"
+        ],
+        "optional": false,
+        "type": "string"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains keys with question token.', () => {
+    interface Foo {
+      a?: string;
+    }
+    expect(keys<Foo>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": true,
+        "type": "string"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains keys with an intersection type 1.', () => {
+    interface Foo {
+      a: string;
+    }
+    interface Bar {
+      b: string;
+    }
+    expect(keys<Foo & Bar>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "b",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains keys with an intersection type 2.', () => {
+    interface Foo {
+      a: string | number;
+    }
+    interface Bar {
+      b: string;
+    }
+    expect(keys<Foo & Bar>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": [
+          "string",
+          "number"
+        ]
+      },
+      {
+        "name": "b",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains keys with an union type 1.', () => {
+    interface Foo {
+      a: string;
+    }
+    interface Bar {
+      a: string;
+      b: string;
+    }
+    expect(keys<Foo | Bar>()).toMatchObject([
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      }
+    ]);
+  });
+
+  test('Should get keys of interface which contains keys with an union type 2.', () => {
+    interface Foo {
+      a: string;
     }
     interface Bar {
       a: number;
-      b: boolean;
-      c: Baz;
-    }
-    interface Baz {
-      a: Function;
-      b: number;
-    }
-    type T = {
-      a: number[];
       b: string;
     }
-    expect(keys<Foo>()).toMatchObject([
-      { name: 'a', optional: false },
-      { name: 'b', optional: true },
-      { name: 'c', optional: false },
-      { name: 'd', optional: false },
-      { name: 'e', optional: false },
-      { name: 'f', optional: false },
-      { name: 'g', optional: false },
-      { name: 'h', optional: false },
-      { name: 'i', optional: true },
-      { name: 'j', optional: false },
-      { name: 'k', optional: false },
-      { name: 'l', optional: false },
-      { name: 'l.a', optional: false },
-      { name: 'l.b', optional: false },
-      { name: 'm', optional: false },
-      { name: 'n', optional: false },
-      { name: 'n.a', optional: false },
-      { name: 'n.b', optional: false },
-      { name: 'n.c', optional: false },
-      { name: 'n.c.a', optional: false },
-      { name: 'n.c.b', optional: false },
-      { name: 'n.c.c', optional: false },
-      { name: 'n.c.c.a', optional: false },
-      { name: 'n.c.c.b', optional: false },
-      { name: 'n.c.c.c', optional: false },
-      { name: 'o', optional: false },
-      { name: 'p', optional: false },
-      { name: 'q', optional: false }
-    ]);
-  });
-
-  test('Should get keys of interface 2.', () => {
-    interface Foo {
-      a: string;
-      b: number;
-      c: boolean;
-    }
-    interface Bar {
-      a: string;
-      b: number;
-    }
     expect(keys<Foo | Bar>()).toMatchObject([
-      { name: 'a', optional: false },
-      { name: 'b', optional: false }
-    ]);
-  });
-
-  test('Should get keys of interface 3.', () => {
-    interface Foo {
-      a: string;
-      b: number;
-      c: boolean;
-    }
-    interface Bar {
-      a: string;
-      b: number;
-      d: {
-        a: number;
-        b?: string;
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": [
+          "string",
+          "number"
+        ]
       }
-    }
-    expect(keys<Foo & Bar>()).toMatchObject([
-      { name: 'a', optional: false },
-      { name: 'b', optional: false },
-      { name: 'c', optional: false },
-      { name: 'd', optional: false },
-      { name: 'd.a', optional: false },
-      { name: 'd.b', optional: true }
     ]);
-  });
-
-  test('Should get keys of interface 4.', () => {
-    expect(keys<X>()).toMatchObject([
-      { name: 'a', optional: false },
-      { name: 'b', optional: false },
-      { name: 'c', optional: false },
-      { name: 'c.a', optional: false },
-      { name: 'c.b', optional: false },
-      { name: 'c.c', optional: false },
-      { name: 'c.c.a', optional: false },
-      { name: 'c.c.b', optional: false },
-      { name: 'c.c.c', optional: false }
-    ]);
-  });
-
-  test('Should get keys of interface 5.', () => {
-    class Bar {}
-    interface Foo {
-      a: string[];
-      readonly b: {
-        readonly b1: string;
-        b2: number;
-        b3: {
-          b31: string;
-          b32: string;
-        }
-      }[];
-      c: number;
-      d: boolean;
-      e: Set<string>;
-      f: Symbol;
-      g: Map<string, string>;
-      h: Bar;
-      i?: Function;
-      j: () => {};
-    }
-    console.log(JSON.stringify(keys<Foo>(), null, 4));
   });
 });
