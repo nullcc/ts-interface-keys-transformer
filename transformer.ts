@@ -78,7 +78,7 @@ const getSymbolProperties = (symbol: ts.Symbol, outerLayerProperties: Property[]
   };
   if (symbol.valueDeclaration && symbol.valueDeclaration['type'].kind === ts.SyntaxKind.ArrayType) { // array
     const elementType = getPropertyType(symbol.valueDeclaration['type'].elementType);
-    if (elementType === 'object') {
+    if (symbol.valueDeclaration['type'].elementType.members) {
       property.elementKeys = _.flattenDeep(symbol.valueDeclaration['type'].elementType.members.map((member: any) => {
         return getSymbolProperties(member.symbol, [], symbolMap);
       }));
@@ -137,6 +137,12 @@ const _getPropertiesOfSymbol = (symbol: ts.Symbol, propertyPathElements: Propert
 };
 
 const getPropertyType = (symbol: any): string => {
+  if (symbol.intrinsicName) {
+    return symbol.intrinsicName;
+  }
+  if (symbol.types) {
+    return symbol.types.map((token: any) => getPropertyType(token));
+  }
   switch (symbol.kind) {
     case ts.SyntaxKind.ArrayType:
       return 'array';
@@ -154,12 +160,14 @@ const getPropertyType = (symbol: any): string => {
       return 'any';
     case ts.SyntaxKind.NullKeyword:
       return 'null';
+    case ts.SyntaxKind.ObjectKeyword:
+      return 'object';
     case ts.SyntaxKind.TypeLiteral:
       return 'object';
     case ts.SyntaxKind.UnionType:
       return symbol.types.map((token: any) => getPropertyType(token));
     case ts.SyntaxKind.IntersectionType:
-      return symbol.types.map((token: any) => getPropertyType(token))
+      return symbol.types.map((token: any) => getPropertyType(token));
     default:
       return 'unknown';
   }
