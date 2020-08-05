@@ -87,7 +87,14 @@ const getSymbolProperties = (symbol: ts.Symbol, outerLayerProperties: Property[]
         return getSymbolProperties(member.symbol, [], symbolMap);
       }));
     } else {
-      property.elementType = elementType;
+      const members = symbolMap.has(elementType) ? (symbolMap.get(elementType)!['declarations'][0] as any).members : [];
+      if (members && members.length > 0) {
+        property.elementKeys = _.flattenDeep(members.map((member: any) => {
+          return getSymbolProperties(member.symbol, [], symbolMap);
+        }));
+      } else {
+        property.elementType = elementType;
+      }
     }
   } else if (symbol.valueDeclaration && symbol.valueDeclaration['type']['typeArguments']) { // for Array<xxx>
     let type;

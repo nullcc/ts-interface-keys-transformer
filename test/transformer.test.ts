@@ -404,7 +404,7 @@ describe('Test transformer.', () => {
     ]);
   });
 
-  test('Should 123', () => {
+  test('Should get keys of interface which contains keys with an array type.', () => {
     expect(keys<Foo>()).toMatchObject( [
       {
         "name": "a",
@@ -495,7 +495,21 @@ describe('Test transformer.', () => {
         "modifiers": [],
         "optional": false,
         "type": "array",
-        "elementType": "Baz"
+        "elementKeys": [
+          {
+            "name": "a",
+            "modifiers": [],
+            "optional": false,
+            "type": "number"
+          },
+          {
+            "name": "b",
+            "modifiers": [],
+            "optional": false,
+            "type": "string"
+          }
+        ]
+
       }
     ]);
   });
