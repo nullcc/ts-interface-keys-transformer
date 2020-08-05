@@ -1,4 +1,5 @@
 import { keys } from '../index';
+import { Foo } from './interface';
 
 describe('Test transformer.', () => {
   test('Should get keys of interface which contains simple key types.', () => {
@@ -399,6 +400,102 @@ describe('Test transformer.', () => {
           "string",
           "number"
         ]
+      }
+    ]);
+  });
+
+  test('Should 123', () => {
+    expect(keys<Foo>()).toMatchObject( [
+      {
+        "name": "a",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "bar",
+        "modifiers": [],
+        "optional": false,
+        "type": "Bar"
+      },
+      {
+        "name": "bar.a",
+        "modifiers": [],
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "bar.b",
+        "modifiers": [],
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "bazArray1",
+        "modifiers": [],
+        "optional": false,
+        "type": "Array",
+        "elementKeys": [
+          {
+            "name": "a",
+            "modifiers": [],
+            "optional": false,
+            "type": "number"
+          },
+          {
+            "name": "b",
+            "modifiers": [],
+            "optional": false,
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "bazArray2",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementKeys": [
+          {
+            "name": "a",
+            "modifiers": [],
+            "optional": false,
+            "type": "number"
+          },
+          {
+            "name": "b",
+            "modifiers": [],
+            "optional": false,
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "bazArray3",
+        "modifiers": [],
+        "optional": false,
+        "type": "Array",
+        "elementKeys": [
+          {
+            "name": "a",
+            "modifiers": [],
+            "optional": false,
+            "type": "number"
+          },
+          {
+            "name": "b",
+            "modifiers": [],
+            "optional": false,
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "bazArray4",
+        "modifiers": [],
+        "optional": false,
+        "type": "array",
+        "elementType": "Baz"
       }
     ]);
   });

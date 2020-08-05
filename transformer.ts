@@ -90,7 +90,12 @@ const getSymbolProperties = (symbol: ts.Symbol, outerLayerProperties: Property[]
       property.elementType = elementType;
     }
   } else if (symbol.valueDeclaration && symbol.valueDeclaration['type']['typeArguments']) { // for Array<xxx>
-    property.elementKeys = _.flattenDeep(symbol.valueDeclaration['type']['typeArguments'][0].members.map((member: any) => {
+    let type;
+    if (symbol.valueDeclaration['type']['typeArguments'][0].typeName) {
+      type = symbol.valueDeclaration['type']['typeArguments'][0].typeName.escapedText;
+    }
+    const members = symbolMap.has(type) ? (symbolMap.get(type)!['declarations'][0] as any).members : symbol.valueDeclaration['type']['typeArguments'][0].members;
+    property.elementKeys = _.flattenDeep(members.map((member: any) => {
       return getSymbolProperties(member.symbol, [], symbolMap);
     }));
   }
