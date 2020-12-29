@@ -13,7 +13,7 @@ export default (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   };
 }
 
-interface Property {
+export interface Property {
   name: string;
   modifiers: string[];
   optional: boolean;
