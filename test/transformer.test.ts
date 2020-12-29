@@ -4,6 +4,12 @@ import { Foo } from './interface';
 describe('Test transformer.', () => {
   test('Should get keys of interface which contains simple key types.', () => {
     interface Foo {
+      /**
+       * Note on parameter a
+       * Note line 2
+       * @description somethings
+       * @returns somethings2
+       */
       a: string;
       b: number;
       c: boolean;
@@ -17,7 +23,9 @@ describe('Test transformer.', () => {
         "name": "a",
         "modifiers": [],
         "optional": false,
-        "type": "string"
+        "type": "string",
+        "title": "Note on parameter a,Note line 2",
+        "args": { description: "somethings", returns: "somethings2" }
       },
       {
         "name": "b",
