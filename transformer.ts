@@ -13,13 +13,17 @@ export default (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   };
 }
 
-interface Property {
+export interface Property {
   name: string;
   modifiers: string[];
   optional: boolean;
   type: string;
   elementKeys?: string[];
   elementType?: any;
+  title?: string;
+  args?: {
+    [key: string]: string;
+  };
 }
 
 const symbolMap = new Map<string, ts.Symbol>();
@@ -106,6 +110,29 @@ const getSymbolProperties = (symbol: ts.Symbol, outerLayerProperties: Property[]
       return getSymbolProperties(member.symbol, [], symbolMap);
     }));
   }
+
+  if (symbol.valueDeclaration) {
+    const fullText = symbol.valueDeclaration.getFullText();
+    const title_reg = /(?<=\* )[^@](.*)+[^\n]/g;
+    const title = fullText.match(title_reg);
+    if (title) {
+      property.title = title.toString();
+    }
+
+    const args_reg = /(?<=\* @).*/g;
+    const args = fullText.match(args_reg);
+    if (args) {
+      property.args = args.reduce((p, c) => {
+        const key = c.match(/[^\s]+/);
+        const value = c.match(/(?<=\s).*/);
+        if (key) {
+          p[key[0]] = value ? value[0] : ''
+        }
+        return p;
+      }, {});
+    }
+  }
+
   properties.push(property);
 
   const propertiesOfSymbol = _getPropertiesOfSymbol(symbol, propertyPathElements, symbolMap);
